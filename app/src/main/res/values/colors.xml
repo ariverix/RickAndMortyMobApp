@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Rick and Morty Style -->
+    <color name="portal_green">#00FF9C</color> <!-- Неоновый зелёный (портал) -->
+    <color name="plumbus_purple">#2A003F</color> <!-- Тёмно-фиолетовый -->
+    <color name="squanchy_yellow">#F9FF00</color> <!-- Кислотно-жёлтый -->
+    <color name="space_dark">#0B0C10</color> <!-- Космический фон -->
+    <color name="morty_white">#FFFFFF</color> <!-- Белый текст -->
+    <color name="rick_blue">#00E6FF</color> <!-- Ярко-бирюзовый акцент -->
+</resources>
