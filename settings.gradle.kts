@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "UserInterfaceApp"
+rootProject.name = "RickAndMorty"
 include(":app")

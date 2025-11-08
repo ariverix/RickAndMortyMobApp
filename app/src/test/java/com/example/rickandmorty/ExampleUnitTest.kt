@@ -1,4 +1,4 @@
-package com.example.userinterfaceapp
+package com.example.rickandmorty
 
 import org.junit.Test
 

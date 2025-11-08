@@ -6,11 +6,11 @@ plugins {
 
 
 android {
-    namespace = "com.example.userinterfaceapp"
+    namespace = "com.example.rickandmorty"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.userinterfaceapp"
+        applicationId = "com.example.rickandmorty"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

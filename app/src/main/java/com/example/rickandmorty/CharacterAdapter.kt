@@ -1,6 +1,5 @@
-package com.example.userinterfaceapp
+package com.example.rickandmorty
 
-import android.R
 import android.graphics.Typeface
 import android.view.View
 import android.view.ViewGroup

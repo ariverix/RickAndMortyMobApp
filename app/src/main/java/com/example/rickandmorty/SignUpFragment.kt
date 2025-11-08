@@ -1,4 +1,4 @@
-package com.example.userinterfaceapp
+package com.example.rickandmorty
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import com.example.userinterfaceapp.databinding.FragmentSignUpBinding
+import com.example.rickandmorty.databinding.FragmentSignUpBinding
 
 class SignUpFragment : BaseFragment() {
 

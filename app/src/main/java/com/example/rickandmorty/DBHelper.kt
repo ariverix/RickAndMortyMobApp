@@ -1,4 +1,4 @@
-package com.example.userinterfaceapp
+package com.example.rickandmorty
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

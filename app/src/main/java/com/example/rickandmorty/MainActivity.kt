@@ -1,10 +1,10 @@
-package com.example.userinterfaceapp
+package com.example.rickandmorty
 
 import android.os.Bundle
 import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.example.userinterfaceapp.databinding.ActivityMainBinding
+import com.example.rickandmorty.databinding.ActivityMainBinding
 
 class MainActivity : BaseActivity() {
 

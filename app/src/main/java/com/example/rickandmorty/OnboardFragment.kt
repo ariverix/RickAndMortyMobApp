@@ -1,11 +1,11 @@
-package com.example.userinterfaceapp
+package com.example.rickandmorty
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.example.userinterfaceapp.databinding.FragmentOnboardBinding
+import com.example.rickandmorty.databinding.FragmentOnboardBinding
 
 class OnboardFragment : BaseFragment() {
 
