@@ -1,9 +1,11 @@
-package com.example.rickandmorty
+package com.example.rickandmorty.ui.main
 
 import android.os.Bundle
 import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.example.rickandmorty.R
+import com.example.rickandmorty.ui.base.BaseActivity
 import com.example.rickandmorty.databinding.ActivityMainBinding
 
 class MainActivity : BaseActivity() {

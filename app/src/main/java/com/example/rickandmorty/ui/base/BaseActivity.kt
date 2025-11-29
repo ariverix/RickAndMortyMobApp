@@ -1,4 +1,4 @@
-package com.example.rickandmorty
+package com.example.rickandmorty.ui.base
 
 import android.os.Bundle
 import android.util.Log

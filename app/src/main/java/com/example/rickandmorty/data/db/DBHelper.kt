@@ -1,9 +1,9 @@
-package com.example.rickandmorty
+package com.example.rickandmorty.data.db
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.content.ContentValues
 
 class DBHelper(context: Context) : SQLiteOpenHelper(context, "users.db", null, 1) {
 
@@ -29,14 +29,22 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "users.db", null, 1
         )
         val exists = cursor.count > 0
         cursor.close()
+        db.close()
         return exists
     }
 
     fun addUser(email: String, password: String) {
         val db = writableDatabase
-        val cv = ContentValues()
-        cv.put("email", email)
-        cv.put("password", password)
-        db.insert("users", null, cv)
+        val cv = ContentValues().apply {
+            put("email", email)
+            put("password", password)
+        }
+        try {
+            db.insertOrThrow("users", null, cv)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
     }
 }

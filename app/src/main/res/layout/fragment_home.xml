@@ -1,16 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/space_dark"
-    android:fitsSystemWindows="true">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/plumbus_purple"
-        android:elevation="4dp">
+        android:background="@color/plumbus_purple">
 
         <TextView
             android:layout_width="wrap_content"
@@ -24,10 +22,17 @@
     </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/characters_recycler_view"
+        android:id="@+id/charactersRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="Персонажи"
         android:padding="8dp" />
 
+    <!-- этот ProgressBar показывается только при первой загрузке -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:indeterminateTint="@color/portal_green" />
 </LinearLayout>

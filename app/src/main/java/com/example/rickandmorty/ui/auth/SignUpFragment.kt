@@ -1,4 +1,4 @@
-package com.example.rickandmorty
+package com.example.rickandmorty.ui.auth
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import com.example.rickandmorty.data.model.User
+import com.example.rickandmorty.data.db.DBHelper
 import com.example.rickandmorty.databinding.FragmentSignUpBinding
+import com.example.rickandmorty.ui.base.BaseFragment
 
 class SignUpFragment : BaseFragment() {
 
@@ -55,6 +58,12 @@ class SignUpFragment : BaseFragment() {
                     logEvent("Пользователь добавлен в БД")
                     Toast.makeText(requireContext(), "Аккаунт создан", Toast.LENGTH_SHORT).show()
 
+                    binding.etName.text?.clear()
+                    binding.editTextTextEmailAddress.text?.clear()
+                    binding.editTextTextPassword.text?.clear()
+                    binding.etAge.text?.clear()
+                    binding.rgGender.clearCheck()
+
                     val user = User(name, email, password, age, gender)
                     val action = SignUpFragmentDirections.actionSignUpFragmentToSignInFragment(
                         userName = name,
@@ -64,8 +73,9 @@ class SignUpFragment : BaseFragment() {
                     navController.navigate(action)
                 } catch (e: Exception) {
                     logEvent("Ошибка регистрации: ${e.message}")
-                    Toast.makeText(requireContext(), "Пользователь уже существует", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Пользователь с таким email уже существует", Toast.LENGTH_SHORT).show()
                 }
+
             }
         }
 

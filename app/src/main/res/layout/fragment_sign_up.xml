@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/space_dark"
-    tools:context=".SignUpFragment">
+    tools:context=".ui.auth.SignUpFragment">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -147,7 +147,7 @@
         <Button
             android:id="@+id/button_input"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:backgroundTint="@color/portal_green"
             android:text="Зарегистрироваться"

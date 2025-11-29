@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/onboardFragment"
-        android:name="com.example.rickandmorty.OnboardFragment"
+        android:name="com.example.rickandmorty.ui.onboard.OnboardFragment"
         android:label="Onboarding">
         <action
             android:id="@+id/action_onboardFragment_to_signInFragment"
@@ -15,7 +15,7 @@
 
     <fragment
         android:id="@+id/signInFragment"
-        android:name="com.example.rickandmorty.SignInFragment"
+        android:name="com.example.rickandmorty.ui.auth.SignInFragment"
         android:label="Sign In">
         <argument
             android:name="userName"
@@ -29,7 +29,7 @@
             android:defaultValue="@null" />
         <argument
             android:name="userObject"
-            app:argType="com.example.rickandmorty.User"
+            app:argType="com.example.rickandmorty.data.model.User"
             app:nullable="true"
             android:defaultValue="@null" />
         <action
@@ -44,7 +44,7 @@
 
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.example.rickandmorty.SignUpFragment"
+        android:name="com.example.rickandmorty.ui.auth.SignUpFragment"
         android:label="Sign Up">
         <action
             android:id="@+id/action_signUpFragment_to_signInFragment"
@@ -55,6 +55,6 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.rickandmorty.HomeFragment"
+        android:name="com.example.rickandmorty.ui.home.HomeFragment"
         android:label="Home" />
 </navigation>

@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/space_dark"
-    tools:context=".OnboardFragment">
+    tools:context=".ui.onboard.OnboardFragment">
 
     <ImageView
         android:id="@+id/ic_welcome"

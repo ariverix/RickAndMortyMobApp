@@ -1,4 +1,4 @@
-package com.example.rickandmorty
+package com.example.rickandmorty.ui.onboard
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.rickandmorty.databinding.FragmentOnboardBinding
+import com.example.rickandmorty.ui.base.BaseFragment
 
 class OnboardFragment : BaseFragment() {
 
