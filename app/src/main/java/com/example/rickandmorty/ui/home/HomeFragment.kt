@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmorty.data.repository.CharacterRepository
@@ -39,6 +40,15 @@ class HomeFragment : BaseFragment() {
         adapter = CharacterAdapter(allCharacters)
         binding.charactersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.charactersRecyclerView.adapter = adapter
+
+        binding.homeToolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == com.example.rickandmorty.R.id.action_settings) {
+                findNavController().navigate(com.example.rickandmorty.R.id.action_homeFragment_to_settingsFragment)
+                true
+            } else {
+                false
+            }
+        }
 
         loadPage(currentPage)
 
