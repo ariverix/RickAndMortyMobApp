@@ -56,5 +56,14 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.rickandmorty.ui.home.HomeFragment"
-        android:label="Home" />
+        android:label="Home">
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.rickandmorty.ui.settings.SettingsFragment"
+        android:label="Settings" />
 </navigation>
