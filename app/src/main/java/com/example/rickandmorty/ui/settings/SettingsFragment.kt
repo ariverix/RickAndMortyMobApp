@@ -1,10 +1,14 @@
 package com.example.rickandmorty.ui.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +36,23 @@ class SettingsFragment : BaseFragment() {
 
     private val dataStore by lazy { SettingsDataStore(requireContext()) }
     private val sharedPreferences by lazy { SettingsPreferences(requireContext()) }
+    private var pendingStorageAction: (() -> Unit)? = null
+
+    private val storagePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.values.all { it }
+            if (granted) {
+                pendingStorageAction?.invoke()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Предоставьте доступ к памяти для работы с резервными копиями",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            pendingStorageAction = null
+            updateBackupControls()
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +69,7 @@ class SettingsFragment : BaseFragment() {
         setupListeners()
         observeSettings()
         updateBackupInfo()
+        updateBackupControls()
     }
 
     private fun setupFields() {
@@ -81,17 +103,17 @@ class SettingsFragment : BaseFragment() {
 
         binding.createBackupButton.setOnClickListener {
             saveInputs()
-            createBackupFile()
+            withStoragePermission { createBackupFile() }
         }
 
         binding.deleteBackupButton.setOnClickListener {
             saveInputs()
-            deleteBackupFile()
+            withStoragePermission { deleteBackupFile() }
         }
 
         binding.restoreBackupButton.setOnClickListener {
             saveInputs()
-            restoreBackupFile()
+            withStoragePermission { restoreBackupFile() }
         }
 
         binding.toolbar.setNavigationOnClickListener {
@@ -213,14 +235,19 @@ class SettingsFragment : BaseFragment() {
 
     private fun updateBackupInfo() {
         val file = File(getPublicFolder(), sharedPreferences.getBackupName())
-        if (file.exists()) {
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-            val modified = dateFormat.format(Date(file.lastModified()))
-            val sizeKb = file.length() / 1024
-            binding.backupInfo.text = "Файл: ${file.name}\nПуть: ${file.parent}\nРазмер: ${sizeKb} КБ\nОбновлён: $modified"
-            binding.deleteBackupButton.isEnabled = true
+        if (hasStoragePermission()) {
+            if (file.exists()) {
+                val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+                val modified = dateFormat.format(Date(file.lastModified()))
+                val sizeKb = file.length() / 1024
+                binding.backupInfo.text = "Файл: ${file.name}\nПуть: ${file.parent}\nРазмер: ${sizeKb} КБ\nОбновлён: $modified"
+                binding.deleteBackupButton.isEnabled = true
+            } else {
+                binding.backupInfo.text = "Файл не создан"
+                binding.deleteBackupButton.isEnabled = false
+            }
         } else {
-            binding.backupInfo.text = "Файл не создан"
+            binding.backupInfo.text = "Нет доступа к общей памяти"
             binding.deleteBackupButton.isEnabled = false
         }
 
@@ -232,6 +259,8 @@ class SettingsFragment : BaseFragment() {
         } else {
             binding.internalBackupInfo.text = "Резервная копия отсутствует"
         }
+
+        updateBackupControls()
     }
 
     private fun hasInternalBackup(): Boolean = getInternalCopy().exists()
@@ -240,6 +269,40 @@ class SettingsFragment : BaseFragment() {
 
     private fun getPublicFolder(): File = android.os.Environment
         .getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+
+    private fun withStoragePermission(action: () -> Unit) {
+        if (hasStoragePermission()) {
+            action()
+        } else {
+            pendingStorageAction = action
+            storagePermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            )
+        }
+        updateBackupControls()
+    }
+
+    private fun hasStoragePermission(): Boolean {
+        val context = requireContext()
+        val readGranted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+        val writeGranted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+        return readGranted && writeGranted
+    }
+
+    private fun updateBackupControls() {
+        val hasPermission = hasStoragePermission()
+        binding.createBackupButton.isEnabled = hasPermission
+        binding.restoreBackupButton.isEnabled = hasPermission && hasInternalBackup()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

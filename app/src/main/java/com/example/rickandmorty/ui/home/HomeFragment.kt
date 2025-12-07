@@ -50,6 +50,10 @@ class HomeFragment : BaseFragment() {
             }
         }
 
+        binding.openSettingsButton.setOnClickListener {
+            findNavController().navigate(com.example.rickandmorty.R.id.action_homeFragment_to_settingsFragment)
+        }
+
         loadPage(currentPage)
 
         binding.charactersRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
