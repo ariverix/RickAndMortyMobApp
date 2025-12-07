@@ -25,8 +25,8 @@ class SettingsPreferences(context: Context) {
         private const val KEY_NICKNAME = "nickname"
         private const val KEY_BACKUP_NAME = "backup_file_name"
 
-        private const val DEFAULT_EMAIL = ""
-        private const val DEFAULT_NICKNAME = ""
+        private const val DEFAULT_EMAIL = "student@example.com"
+        private const val DEFAULT_NICKNAME = "Student"
         private const val DEFAULT_BACKUP_NAME = "backup_01.txt"
     }
 }
