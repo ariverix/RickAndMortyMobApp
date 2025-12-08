@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.rickandmorty.R
+import com.google.android.material.R as MaterialR
 
 class CharacterAdapter(
     private val characters: MutableList<CharacterUi>
@@ -39,6 +40,22 @@ class CharacterAdapter(
                 orientation = LinearLayout.HORIZONTAL
                 setPadding(16, 16, 16, 16)
                 gravity = Gravity.CENTER_VERTICAL
+
+                val typedValue = android.util.TypedValue()
+                context.theme.resolveAttribute(
+                    MaterialR.attr.colorSurface,
+                    typedValue,
+                    true
+                )
+                setBackgroundColor(typedValue.data)
+
+                val params = RecyclerView.LayoutParams(
+                    RecyclerView.LayoutParams.MATCH_PARENT,
+                    RecyclerView.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 8, 0, 8)
+                }
+                layoutParams = params
             }
 
             val img = ImageView(parent.context).apply {
@@ -74,14 +91,17 @@ class CharacterAdapter(
             img.load(character.image)
             img.contentDescription = character.name
 
+            val typedValue = android.util.TypedValue()
+            holder.itemView.context.theme.resolveAttribute(
+                MaterialR.attr.colorOnSurface,
+                typedValue,
+                true
+            )
+            val textColor = typedValue.data
+
             val nameView = TextView(holder.itemView.context).apply {
                 text = character.name
-                setTextColor(
-                    ContextCompat.getColor(
-                        holder.itemView.context,
-                        R.color.morty_white
-                    )
-                )
+                setTextColor(textColor)
                 textSize = 16f
                 setTypeface(null, Typeface.BOLD)
             }

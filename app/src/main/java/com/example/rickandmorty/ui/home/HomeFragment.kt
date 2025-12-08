@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rickandmorty.data.repository.CharacterRepository
@@ -20,9 +21,9 @@ class HomeFragment : BaseFragment() {
 
     private val allCharacters = mutableListOf<CharacterUi>()
     private lateinit var adapter: CharacterAdapter
-    private var currentPage = 1
     private var isLoading = false
-    private var hasNextPage = true
+
+    private lateinit var repository: CharacterRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,12 +37,20 @@ class HomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        repository = CharacterRepository(requireContext())
+
+        setupRecyclerView()
+        setupButtons()
+        observeCharacters() // Реактивное обновление через Flow
+        performColdStart() // Холодный старт
+    }
+
+    private fun setupRecyclerView() {
         adapter = CharacterAdapter(allCharacters)
         binding.charactersRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.charactersRecyclerView.adapter = adapter
 
-        loadPage(currentPage)
-
+        // Слушатель для пагинации
         binding.charactersRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) {
@@ -49,65 +58,176 @@ class HomeFragment : BaseFragment() {
                     val lastVisible = layoutManager.findLastCompletelyVisibleItemPosition()
                     val total = layoutManager.itemCount
 
-                    if (!isLoading && hasNextPage && lastVisible >= total - 2) {
-                        loadPage(++currentPage)
+                    if (!isLoading && lastVisible >= total - 2) {
+                        loadMoreCharacters()
                     }
                 }
             }
         })
     }
 
-    private fun loadPage(page: Int) {
-        lifecycleScope.launch {
-            try {
-                isLoading = true
-                if (page == 1) binding.progressBar.visibility = View.VISIBLE
-                else adapter.showLoadingFooter(true)
+    private fun setupButtons() {
+        // Кнопка настроек
+        binding.btnSettings.setOnClickListener {
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
+            )
+        }
 
-                val response = CharacterRepository.getCharacters(page)
+        // Кнопка обновления
+        binding.btnRefresh.setOnClickListener {
+            refreshCharacters()
+        }
 
+        // SwipeRefreshLayout для обновления свайпом
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            refreshCharacters()
+        }
+    }
+
+    // C. Реактивное обновление через Flow
+    private fun observeCharacters() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repository.charactersFlow.collect { characters ->
+                logEvent("Flow: получено ${characters.size} персонажей")
+
+                // Обновляем список
+                allCharacters.clear()
+                allCharacters.addAll(characters)
+
+                // Уведомляем адаптер
+                adapter.notifyDataSetChanged()
+
+                // Скрываем прогресс
                 binding.progressBar.visibility = View.GONE
-                adapter.showLoadingFooter(false)
-                isLoading = false
+                binding.swipeRefreshLayout.isRefreshing = false
 
-                if (response == null) {
-                    Snackbar.make(binding.root, "Ошибка загрузки", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Повторить") { loadPage(page) }
-                        .show()
-                    return@launch
+                // Показывае и скрытие сообщение о пустом списке
+                if (characters.isEmpty()) {
+                    binding.tvEmptyState.visibility = View.VISIBLE
+                    binding.tvEmptyState.text = "Нет данных.\nПотяните вниз для обновления"
+                } else {
+                    binding.tvEmptyState.visibility = View.GONE
                 }
-
-                val mapped = response.results.map {
-                    CharacterUi(
-                        name = it.name,
-                        image = it.image,
-                        status = it.status,
-                        species = it.species
-                    )
-                }
-
-                if (mapped.isEmpty()) {
-                    hasNextPage = false
-                    return@launch
-                }
-
-                val start = allCharacters.size
-                allCharacters.addAll(mapped)
-
-                binding.charactersRecyclerView.post {
-                    adapter.notifyItemRangeInserted(start, mapped.size)
-                }
-
-                logEvent("Загружено ${mapped.size} персонажей (страница $page)")
-            } catch (e: Exception) {
-                binding.progressBar.visibility = View.GONE
-                adapter.showLoadingFooter(false)
-                isLoading = false
-                Snackbar.make(binding.root, "Ошибка сети: ${e.message}", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Повторить") { loadPage(page) }
-                    .show()
             }
         }
+    }
+
+    // B. Холодный старт
+    private fun performColdStart() {
+        logEvent("Выполняется холодный старт")
+        binding.progressBar.visibility = View.VISIBLE
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val isEmpty = repository.isDatabaseEmpty()
+
+                if (isEmpty) {
+                    logEvent("БД пуста, загружаем данные из API")
+                    // БД пуста - загружаем из API
+                    loadCharactersFromApi(1)
+                } else {
+                    logEvent("БД содержит данные, отображаем из Room")
+                    // БД содержит данные автоматически отобразятся через Flow
+                    binding.progressBar.visibility = View.GONE
+                }
+            } catch (e: Exception) {
+                logEvent("Ошибка холодного старта: ${e.message}")
+                binding.progressBar.visibility = View.GONE
+                showError("Ошибка загрузки данных: ${e.message}")
+            }
+        }
+    }
+
+    // B. Обновление списка
+    private fun refreshCharacters() {
+        logEvent("Обновление списка персонажей")
+        isLoading = true
+        binding.progressBar.visibility = View.VISIBLE
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = repository.refreshCharacters()
+
+                result.onSuccess {
+                    logEvent("Список успешно обновлен")
+                    Snackbar.make(binding.root, "Список обновлен", Snackbar.LENGTH_SHORT).show()
+                }
+
+                result.onFailure { exception ->
+                    logEvent("Ошибка обновления: ${exception.message}")
+                    showError("Ошибка обновления: ${exception.message}")
+                }
+            } catch (e: Exception) {
+                logEvent("Ошибка обновления: ${e.message}")
+                showError("Ошибка обновления: ${e.message}")
+            } finally {
+                isLoading = false
+                binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
+            }
+        }
+    }
+
+    // B. Загрузка следующей страницы
+    private fun loadMoreCharacters() {
+        logEvent("Загрузка следующей страницы")
+        isLoading = true
+        adapter.showLoadingFooter(true)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = repository.loadNextPage()
+
+                result.onSuccess { page ->
+                    logEvent("Загружена страница $page")
+                }
+
+                result.onFailure { exception ->
+                    logEvent("Ошибка загрузки страницы: ${exception.message}")
+                    showError("Больше персонажей нет или ошибка загрузки")
+                }
+            } catch (e: Exception) {
+                logEvent("Ошибка загрузки страницы: ${e.message}")
+                showError("Ошибка загрузки: ${e.message}")
+            } finally {
+                isLoading = false
+                adapter.showLoadingFooter(false)
+            }
+        }
+    }
+
+    // Загрузка из API (при холодном старте)
+    private fun loadCharactersFromApi(page: Int) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                isLoading = true
+                val result = repository.fetchAndSaveCharacters(page)
+
+                result.onSuccess {
+                    logEvent("Данные успешно загружены и сохранены в БД")
+                }
+
+                result.onFailure { exception ->
+                    logEvent("Ошибка загрузки: ${exception.message}")
+                    showError("Ошибка загрузки: ${exception.message}")
+                }
+            } catch (e: Exception) {
+                logEvent("Ошибка загрузки: ${e.message}")
+                showError("Ошибка загрузки: ${e.message}")
+            } finally {
+                isLoading = false
+                binding.progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction("Повторить") {
+                performColdStart()
+            }
+            .show()
     }
 
     override fun onDestroyView() {

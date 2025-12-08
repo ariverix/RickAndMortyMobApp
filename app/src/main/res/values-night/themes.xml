@@ -1,7 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.RickAndMorty" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <!-- Темная тема (по умолчанию) -->
+    <style name="Base.Theme.RickAndMorty" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/portal_green</item>
+        <item name="colorPrimaryVariant">@color/plumbus_purple</item>
+        <item name="colorOnPrimary">@color/space_dark</item>
+        <item name="colorSecondary">@color/rick_blue</item>
+        <item name="colorSecondaryVariant">@color/squanchy_yellow</item>
+        <item name="colorOnSecondary">@color/space_dark</item>
+        <item name="android:colorBackground">@color/space_dark</item>
+        <item name="colorSurface">@color/plumbus_purple</item>
+        <item name="colorOnSurface">@color/morty_white</item>
+        <item name="colorOnBackground">@color/morty_white</item>
+        <item name="android:textColorPrimary">@color/morty_white</item>
+        <item name="android:textColorSecondary">@color/rick_blue</item>
+        <item name="android:statusBarColor">@color/space_dark</item>
+        <item name="android:navigationBarColor">@color/space_dark</item>
     </style>
+
+    <style name="Theme.RickAndMorty" parent="Base.Theme.RickAndMorty" />
 </resources>

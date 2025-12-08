@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/space_dark"
+    android:background="?attr/colorOnPrimary"
     tools:context=".ui.onboard.OnboardFragment">
 
     <ImageView
@@ -30,7 +30,7 @@
         android:text="Wubba Lubba Dub-Dub!"
         android:textSize="28sp"
         android:textStyle="bold"
-        android:textColor="@color/morty_white"
+        android:textColor="?attr/colorOnBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ic_welcome" />
